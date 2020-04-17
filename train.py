@@ -24,7 +24,7 @@ TRAIN_PDF_DIR = '/home/agwave/Data/resume/resume_train_20200121/pdf/'
 def get_score_by_model(model, train_json_path, pdf_root_dir):
     pdf_path = os.listdir(pdf_root_dir)
     random.shuffle(pdf_path)
-    path = pdf_path[:300]
+    path = pdf_path[:len(pdf_path)]
     with open('supporting_document/word_to_ix_add_unk_0219.json') as j:
         word_to_ix = json.load(j)
 
@@ -66,15 +66,11 @@ def get_score_by_model(model, train_json_path, pdf_root_dir):
 def train_all_data():
     embedding_dim = 100
     hidden_dim = 100
-    max_score = 0
-    unimprove_time = 0
-    model_1_epoch = 'model/model_2_epoch_0301.pth'
-    model_save_path = 'model/model_100_all_data_0301.pth'
-    # Make up some training data
+    stop_epoch = 1
+    model_1_epoch = 'model/model_1_epoch_lr0001.pth'
+
     training_data = get_data_from_data_txt(DATA_PERFECT_PATH)
-
     word_to_ix = get_word_to_ix(training_data, min_word_freq=1)
-
     tag_to_ix = {'b-name': 0, 'i-name': 1, 'b-bir': 2, 'i-bir': 3, 'b-gend': 4, 'i-gend': 5,
                  'b-tel': 6, 'i-tel': 7, 'b-acad': 8, 'i-acad': 9, 'b-nati': 10, 'i-nati': 11,
                  'b-live': 12, 'i-live': 13, 'b-poli': 14, 'i-poli': 15, 'b-unv': 16, 'i-unv': 17,
@@ -85,11 +81,11 @@ def train_all_data():
                  'c-post': 42, 'c-unv': 43, 'c-nati': 44, 'c-poli': 45, 'c-prti':46, 'c-comp': 47}
 
     model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, embedding_dim, hidden_dim)
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(
-            30):  # again, normally you would NOT do 300 epochs, it is toy data
+            stop_epoch):  # again, normally you would NOT do 300 epochs, it is toy data
         print("---------------------")
         print("running epon : ", epoch + 1)
         start_time = time.time()
@@ -101,26 +97,15 @@ def train_all_data():
             loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), 15)
             optimizer.step()
-
         cur_epoch_score = get_score_by_model(model, TRAIN_JSON_PATH, TRAIN_PDF_DIR)
         print('score', cur_epoch_score)
         print('running time:', time.time() - start_time)
         print()
-        if epoch == 1:
+        if epoch == stop_epoch:
             torch.save({
                 'model_state_dict': model.state_dict()
             }, model_1_epoch)
-        if cur_epoch_score > max_score:
-            unimprove_time = 0
-            max_score = cur_epoch_score
-            torch.save({
-                'model_state_dict': model.state_dict(),
-            }, model_save_path)
-        else:
-            unimprove_time += 1
-            if unimprove_time > 1:
-                print('score down, break!')
-                break
+
 
 def train_and_val():
     embedding_dim = 100

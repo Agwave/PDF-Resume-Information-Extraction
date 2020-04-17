@@ -13,15 +13,15 @@ from io import StringIO
 
 
 
-# PDF_DIR = './tcdata/test_data/'
-# JSON_FILE_PATH = './test_result.json'
+PDF_DIR = './tcdata/test_data/'
+JSON_FILE_PATH = './test_result.json'
 
-PDF_DIR = '/home/agwave/Data/resume/resume_train_20200121/pdf_simple/'
-JSON_FILE_PATH = '/home/agwave/Data/resume/resume_train_20200121/pdf_simple_file.json'
+# PDF_DIR = '/home/agwave/Data/resume/resume_train_20200121/pdf_simple/'
+# JSON_FILE_PATH = '/home/agwave/Data/resume/resume_train_20200121/pdf_simple_file.json'
 
 EMBEDDING_DIM = 100
 HIDDEN_DIM = 100
-MODEL_PARM_PATH = 'model_2_epoch_0301.pth'
+MODEL_PARM_PATH = 'model_100_all_data_0301.pth'
 
 
 def argmax(vec):

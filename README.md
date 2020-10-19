@@ -6,7 +6,6 @@
 模型的线上得分是0.727，排名 21/1200+
 
 ## 1. 赛题相关
-**赛题和数据**：https://tianchi.aliyun.com/competition/entrance/231771/information
 
 **模型目标**：pdf简历 --> 类别信息 
 
